@@ -1,8 +1,21 @@
-package com.alls.snake;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Project/Maven2/JavaApp/src/main/java/${packagePath}/${mainClassName}.java to edit this template
+ */
+package com.mycompany.mavenproject1;
 
 import java.util.Scanner;
 
+/**
+ *
+ * @author andre.santos
+ */
 public class Snake {
+
+    public static int[] getPosicaoCalda(int[][] posicaoSegmentos) { // TODO refactor
+        int[] posicaoCalda = {posicaoSegmentos[posicaoSegmentos.length - 1][0], posicaoSegmentos[posicaoSegmentos.length - 1][1]};
+        return posicaoCalda;
+    }
 
     public static void printarTabuleiro(String[][] tabuleiro) {
         for (int linhas = 0; linhas < tabuleiro.length; linhas++) {
@@ -45,12 +58,46 @@ public class Snake {
         return true; // TODO
     }
 
-    public static String[][] colocarFruta(int[] input, String[][] tabuleiro) {
-        tabuleiro[input[0]][input[1]] = "F "; // TODO criar char fruta
+    public static String[][] colocarFruta(String[][] tabuleiro, int[] inputFruta) {
+        tabuleiro[inputFruta[0]][inputFruta[1]] = "F "; // TODO criar char fruta
         return tabuleiro;
     }
 
-    public static int[] inputFruta(Scanner scanner, String[][] tabuleiro) {
+    public static boolean podeComerFruta(String[][] tabuleiro, char inputCobra, int[][] posicoesSegmentos) {
+        String string;
+        switch (inputCobra) {
+            case 'w' -> {
+                string = tabuleiro[posicoesSegmentos[0][0] - 1][posicoesSegmentos[0][1]];
+                if ("F ".equals(string)) {
+                    return true;
+                }
+            }
+            case 'a' -> {
+                string = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] - 1];
+                if ("F ".equals(string)) {
+                    return true;
+                }
+            }
+            case 's' -> {
+                string = tabuleiro[posicoesSegmentos[0][0] + 1][posicoesSegmentos[0][1]];
+                if ("F ".equals(string)) {
+                    return true;
+                }
+            }
+            case 'd' -> {
+                string = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] + 1];
+                if ("F ".equals(string)) {
+                    return true;
+                }
+            }
+            default -> {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public static int[] inputFruta(String[][] tabuleiro, Scanner scanner) {
         System.out.println("Input");
         String temp = scanner.next();
 
@@ -65,28 +112,98 @@ public class Snake {
             return input;
         }
         System.out.println("Input n valido");
-        return inputFruta(scanner, tabuleiro);
+        return inputFruta(tabuleiro, scanner);
     }
 
-    public static int[] inputCobra(Scanner scanner, String[][] tabuleiro) {
+    public static int[][] aumentarCobra(int[] inputCobra, int[][] posicaoSegmentos) {
+        int[][] novaPosicaoSegmentos = new int[posicaoSegmentos.length + 1][];
+        System.arraycopy(posicaoSegmentos, 0, novaPosicaoSegmentos, 0, posicaoSegmentos.length);
+        return novaPosicaoSegmentos;
     }
-    
-    public static String[][] moverCobra(int[] input, boolean naoHaFrutaTabuleiro, String[][] tabuleiro) {
 
+    public static char inputCobra(Scanner scanner) {
+        return scanner.next().charAt(0);
     }
 
-    public static void gameLoop(String[][] tabuleiro, boolean naoHaFrutaTabuleiro, Scanner scanner) { // TODO running/clear
-        int[] input;
+    public static int[][] iniciarCobra() { // TODO random?
+        int[][] posicaoSegmentos = {{10, 10}, {10, 11}};
+        return posicaoSegmentos;
+    }
+
+    public static String[][] colocarSegmentos(String[][] tabuleiro, int[][] posicaoSegmentos) {
+        for (int i = 0; i < posicaoSegmentos.length; i++) {
+            tabuleiro[posicaoSegmentos[i][0]][posicaoSegmentos[i][1]] = "O ";
+        }
+        return tabuleiro;
+    }
+
+    public static int[][] moverCobra(char inputCobra, int[][] posicaoSegmentos) { // TODO refactor
+        switch (inputCobra) {
+            case 'w' -> {
+                int[][] temp = posicaoSegmentos;
+                posicaoSegmentos[0][1] = posicaoSegmentos[0][1] - 1;
+                for (int i = 1; i < posicaoSegmentos.length; i++) {
+                    posicaoSegmentos[i] = temp[i - 1];
+                }
+                return posicaoSegmentos;
+            }
+            case 'a' -> {
+                int[][] temp = posicaoSegmentos;
+                posicaoSegmentos[0][0] = posicaoSegmentos[0][0] - 1;
+                for (int i = 1; i < posicaoSegmentos.length; i++) {
+                    posicaoSegmentos[i] = temp[i - 1];
+                }
+                return posicaoSegmentos;
+            }
+            case 's' -> {
+                int[][] temp = posicaoSegmentos;
+                posicaoSegmentos[0][1] = posicaoSegmentos[0][1] + 1;
+                for (int i = 1; i < posicaoSegmentos.length; i++) {
+                    posicaoSegmentos[i] = temp[i - 1];
+                }
+                return posicaoSegmentos;
+            }
+            case 'd' -> {
+                int[][] temp = posicaoSegmentos;
+                posicaoSegmentos[0][0] = posicaoSegmentos[0][0] - 1;
+                for (int i = 1; i < posicaoSegmentos.length; i++) {
+                    posicaoSegmentos[i] = temp[i - 1];
+                }
+                return posicaoSegmentos;
+            }
+            default -> {
+                return posicaoSegmentos;
+            }
+        }
+    }
+
+    public static String[][] test(String[][] tabuleiro, int[] posicaoCalda) {
+        tabuleiro[posicaoCalda[0]][posicaoCalda[1]] = "□ ";
+        return tabuleiro;
+    }
+
+    public static void gameLoop(String[][] tabuleiro, Scanner scanner, int[][] posicaoSegmentos) {
+        char inputCobra;
+        int[] inputFruta = inputFruta(tabuleiro, scanner);
+        tabuleiro = colocarFruta(tabuleiro, inputFruta);
+        tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
 
         while (true) {
             printarTabuleiro(tabuleiro);
-            input = inputFruta(scanner, tabuleiro);
-            if (naoHaFrutaTabuleiro) {
-                tabuleiro = colocarFruta(input, tabuleiro);
-                naoHaFrutaTabuleiro = false;
+
+            inputCobra = inputCobra(scanner);
+
+            if (podeComerFruta(tabuleiro, inputCobra, posicaoSegmentos)) {
+                posicaoSegmentos = aumentarCobra(inputFruta, posicaoSegmentos);
+                inputFruta = inputFruta(tabuleiro, scanner);
+                tabuleiro = colocarFruta(tabuleiro, inputFruta);
+                tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
             }
-            input = inputCobra(scanner, tabuleiro);
-            tabuleiro = moverCobra(input, naoHaFrutaTabuleiro, tabuleiro);
+
+            int[] posicaoCalda = getPosicaoCalda(posicaoSegmentos);
+            posicaoSegmentos = moverCobra(inputCobra, posicaoSegmentos);
+            tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
+            tabuleiro = test(tabuleiro, posicaoCalda);
         }
     }
 
@@ -105,12 +222,11 @@ public class Snake {
         }
 
         String[][] tabuleiro = preencherTabuleiro(tamanhoTabuleiro);
-        int[] input = inputFruta(scanner, tabuleiro);
-        tabuleiro = colocarFruta(input, tabuleiro);
 
-        gameLoop(tabuleiro, false, scanner);
+        int[][] posicaoSegmentos = iniciarCobra();
+
+        gameLoop(tabuleiro, scanner, posicaoSegmentos);
     }
 }
 
-// TODO muder de i e j pra l e c
 // TODO dificuldades com geracao mapas
