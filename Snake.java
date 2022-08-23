@@ -1,15 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Project/Maven2/JavaApp/src/main/java/${packagePath}/${mainClassName}.java to edit this template
- */
-package com.mycompany.mavenproject1;
+package com.alls.snake;
 
 import java.util.Scanner;
 
-/**
- *
- * @author andre.santos
- */
 public class Snake {
 
     public static int[] getPosicaoCalda(int[][] posicaoSegmentos) { // TODO refactor
@@ -126,12 +118,13 @@ public class Snake {
     }
 
     public static int[][] iniciarCobra() { // TODO random?
-        int[][] posicaoSegmentos = {{10, 10}, {10, 11}};
+        int[][] posicaoSegmentos = {{10, 10}, {10, 11}, {10, 12}, {10, 13}};
         return posicaoSegmentos;
     }
 
     public static String[][] colocarSegmentos(String[][] tabuleiro, int[][] posicaoSegmentos) {
-        for (int i = 0; i < posicaoSegmentos.length; i++) {
+        tabuleiro[posicaoSegmentos[0][0]][posicaoSegmentos[0][1]] = "o ";
+        for (int i = 1; i < posicaoSegmentos.length; i++) {
             tabuleiro[posicaoSegmentos[i][0]][posicaoSegmentos[i][1]] = "O ";
         }
         return tabuleiro;
@@ -140,11 +133,15 @@ public class Snake {
     public static int[][] moverCobra(char inputCobra, int[][] posicaoSegmentos) { // TODO refactor
         switch (inputCobra) {
             case 'w' -> {
-                int[][] temp = posicaoSegmentos;
-                posicaoSegmentos[0][1] = posicaoSegmentos[0][1] - 1;
-                for (int i = 1; i < posicaoSegmentos.length; i++) {
-                    posicaoSegmentos[i] = temp[i - 1];
+                int[][] temp = new int[posicaoSegmentos.length][2];
+                for (int i = 0; i < posicaoSegmentos.length; i++) {
+                    System.arraycopy(posicaoSegmentos[i], 0, temp[i], 0, posicaoSegmentos[i].length);
                 }
+                for (int i = 1; i < temp.length; i++) {
+                    posicaoSegmentos[i][0] = temp[i - 1][0];
+                    posicaoSegmentos[i][1] = temp[i - 1][1];
+                }
+                posicaoSegmentos[0][0] = temp[0][0] - 1;
                 return posicaoSegmentos;
             }
             case 'a' -> {
@@ -229,4 +226,6 @@ public class Snake {
     }
 }
 
+// ERRO tamanho teste 5, input fruta 5A
+// TODO muder de i e j pra l e c
 // TODO dificuldades com geracao mapas
