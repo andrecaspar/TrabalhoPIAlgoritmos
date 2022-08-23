@@ -130,48 +130,42 @@ public class Snake {
         return tabuleiro;
     }
 
-    public static int[][] moverCobra(char inputCobra, int[][] posicaoSegmentos) { // TODO refactor
+    public static int[][] avancarSegmentos(int[][] posicaoSegmentos, int[][] temp) {
+        for (int i = 1; i < temp.length; i++) {
+            posicaoSegmentos[i][0] = temp[i - 1][0];
+            posicaoSegmentos[i][1] = temp[i - 1][1];
+        }
+        return posicaoSegmentos;
+    }
+
+    public static int[][] moverCobra(char inputCobra, int[][] posicaoSegmentos) {
+        int[][] temp = new int[posicaoSegmentos.length][2];
+        for (int i = 0; i < posicaoSegmentos.length; i++) {
+            System.arraycopy(posicaoSegmentos[i], 0, temp[i], 0, posicaoSegmentos[i].length);
+        }
+
         switch (inputCobra) {
             case 'w' -> {
-                int[][] temp = new int[posicaoSegmentos.length][2];
-                for (int i = 0; i < posicaoSegmentos.length; i++) {
-                    System.arraycopy(posicaoSegmentos[i], 0, temp[i], 0, posicaoSegmentos[i].length);
-                }
-                for (int i = 1; i < temp.length; i++) {
-                    posicaoSegmentos[i][0] = temp[i - 1][0];
-                    posicaoSegmentos[i][1] = temp[i - 1][1];
-                }
                 posicaoSegmentos[0][0] = temp[0][0] - 1;
-                return posicaoSegmentos;
+                break;
             }
             case 'a' -> {
-                int[][] temp = posicaoSegmentos;
-                posicaoSegmentos[0][0] = posicaoSegmentos[0][0] - 1;
-                for (int i = 1; i < posicaoSegmentos.length; i++) {
-                    posicaoSegmentos[i] = temp[i - 1];
-                }
-                return posicaoSegmentos;
+                posicaoSegmentos[0][1] = temp[0][1] - 1;
+                break;
             }
             case 's' -> {
-                int[][] temp = posicaoSegmentos;
-                posicaoSegmentos[0][1] = posicaoSegmentos[0][1] + 1;
-                for (int i = 1; i < posicaoSegmentos.length; i++) {
-                    posicaoSegmentos[i] = temp[i - 1];
-                }
-                return posicaoSegmentos;
+                posicaoSegmentos[0][0] = temp[0][0] + 1;
+                break;
             }
             case 'd' -> {
-                int[][] temp = posicaoSegmentos;
-                posicaoSegmentos[0][0] = posicaoSegmentos[0][0] - 1;
-                for (int i = 1; i < posicaoSegmentos.length; i++) {
-                    posicaoSegmentos[i] = temp[i - 1];
-                }
-                return posicaoSegmentos;
+                posicaoSegmentos[0][1] = temp[0][1] + 1;
+                break;
             }
             default -> {
-                return posicaoSegmentos;
             }
         }
+        posicaoSegmentos = avancarSegmentos(posicaoSegmentos, temp);
+        return posicaoSegmentos;
     }
 
     public static String[][] test(String[][] tabuleiro, int[] posicaoCalda) {
