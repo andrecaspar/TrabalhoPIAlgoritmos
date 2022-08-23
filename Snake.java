@@ -5,74 +5,88 @@ import java.util.Scanner;
 public class Snake {
 
     public static void printarTabuleiro(String[][] tabuleiro) {
-        for (int i = 0; i < tabuleiro.length; i++) {
-            for (int j = 0; j < tabuleiro.length; j++) {
-                System.out.print(tabuleiro[i][j]);
+        for (int linhas = 0; linhas < tabuleiro.length; linhas++) {
+            for (int colunas = 0; colunas < tabuleiro.length; colunas++) {
+                System.out.print(tabuleiro[linhas][colunas]);
             }
             System.out.println();
         }
     }
 
-    public static void preencherTabuleiro(String[][] tabuleiro) { // TODO refactor
-        for (int i = 0; i < tabuleiro.length; i++) {
-            for (int j = 0; j < tabuleiro.length; j++) {
-                if (j == 0) {
-                    if (i == tabuleiro.length - 1) {
+    public static String[][] preencherTabuleiro(int tamanhoTabuleiro) { // TODO refactor
+        String[][] tabuleiro = new String[tamanhoTabuleiro][tamanhoTabuleiro];
+        for (int linha = 0; linha < tabuleiro.length; linha++) {
+            for (int coluna = 0; coluna < tabuleiro.length; coluna++) {
+                if (coluna == 0) {
+                    if (linha == tabuleiro.length - 1) {
                         if (tabuleiro.length >= 11) {
-                            tabuleiro[i][j] = "   ";
+                            tabuleiro[linha][coluna] = "   ";
                         } else {
-                            tabuleiro[i][j] = "  ";
+                            tabuleiro[linha][coluna] = "  ";
                         }
                     } else {
-                        if (tabuleiro.length >= 11 && i < 9) {
-                            tabuleiro[i][j] = Integer.toString(i + 1) + "  ";
+                        if (tabuleiro.length >= 11 && linha < 9) {
+                            tabuleiro[linha][coluna] = Integer.toString(linha + 1) + "  ";
                         } else {
-                            tabuleiro[i][j] = Integer.toString(i + 1) + ' ';
+                            tabuleiro[linha][coluna] = Integer.toString(linha + 1) + ' ';
                         }
                     }
-                } else if (i == tabuleiro.length - 1) {
-                    tabuleiro[i][j] = (char) (64 + j) + " ";
+                } else if (linha == tabuleiro.length - 1) {
+                    tabuleiro[linha][coluna] = (char) (64 + coluna) + " ";
                 } else {
-                    tabuleiro[i][j] = "□ "; // TODO criar char tabuleiro variavel
+                    tabuleiro[linha][coluna] = "□ "; // TODO criar char tabuleiro variavel
                 }
             }
-        }
-    }
-
-    public static boolean posicaoValida(int x, int y, int tamanhoTabuleiro) {
-        return true; // TODO
-    }
-
-    public static String[][] colocarFruta(int x, int y, String[][] tabuleiro) {
-        if (posicaoValida(x, y, tabuleiro.length)) {
-            String[][] novoTabuleiro = tabuleiro;
-            novoTabuleiro[x][y] = "F "; // TODO criar char fruta 
-            return novoTabuleiro;
-        } else {
-            //print erro funcao
         }
         return tabuleiro;
     }
 
-    public static int[] inputFruta(Scanner scanner) {
-        int[] input = new int[2];
-        
+    public static boolean posicaoValida(int[] input, int tamanhoTabuleiro) {
+        return true; // TODO
+    }
+
+    public static String[][] colocarFruta(int[] input, String[][] tabuleiro) {
+        tabuleiro[input[0]][input[1]] = "F "; // TODO criar char fruta
+        return tabuleiro;
+    }
+
+    public static int[] inputFruta(Scanner scanner, String[][] tabuleiro) {
         System.out.println("Input");
         String temp = scanner.next();
 
-        input[0] = Character.getNumericValue(temp.charAt(0)) - 1;
-        input[1] = temp.charAt(1) - 64;
-        
-        return input;
+        String coordenadaNumerica = temp.substring(0, temp.length() - 1);
+        char coordenadaAlfabetica = temp.charAt(temp.length() - 1);
+
+        int[] input = new int[2];
+        input[0] = Integer.parseInt(coordenadaNumerica) - 1;
+        input[1] = coordenadaAlfabetica - 64;
+
+        if (posicaoValida(input, tabuleiro.length)) {
+            return input;
+        }
+        System.out.println("Input n valido");
+        return inputFruta(scanner, tabuleiro);
     }
 
-    public static void gameLoop(String[][] tabuleiro, Scanner scanner) { // TODO running/clear
+    public static int[] inputCobra(Scanner scanner, String[][] tabuleiro) {
+    }
+    
+    public static String[][] moverCobra(int[] input, boolean naoHaFrutaTabuleiro, String[][] tabuleiro) {
+
+    }
+
+    public static void gameLoop(String[][] tabuleiro, boolean naoHaFrutaTabuleiro, Scanner scanner) { // TODO running/clear
         int[] input;
 
         while (true) {
             printarTabuleiro(tabuleiro);
-            input = inputFruta(scanner);
-            tabuleiro = colocarFruta(input[0], input[1], tabuleiro);
+            input = inputFruta(scanner, tabuleiro);
+            if (naoHaFrutaTabuleiro) {
+                tabuleiro = colocarFruta(input, tabuleiro);
+                naoHaFrutaTabuleiro = false;
+            }
+            input = inputCobra(scanner, tabuleiro);
+            tabuleiro = moverCobra(input, naoHaFrutaTabuleiro, tabuleiro);
         }
     }
 
@@ -90,10 +104,11 @@ public class Snake {
             tamanhoTabuleiro = 8;
         }
 
-        String[][] tabuleiro = new String[tamanhoTabuleiro][tamanhoTabuleiro];
-        preencherTabuleiro(tabuleiro);
+        String[][] tabuleiro = preencherTabuleiro(tamanhoTabuleiro);
+        int[] input = inputFruta(scanner, tabuleiro);
+        tabuleiro = colocarFruta(input, tabuleiro);
 
-        gameLoop(tabuleiro, scanner);
+        gameLoop(tabuleiro, false, scanner);
     }
 }
 
