@@ -4,6 +4,8 @@ import java.util.Scanner;
 
 public class Snake {
 
+    public static String caracterTabuleiro = "  "; // TODO fazer espaço fixo nas funcoes
+
     public static int[] getPosicaoCalda(int[][] posicaoSegmentos) { // TODO refactor
         int[] posicaoCalda = {posicaoSegmentos[posicaoSegmentos.length - 1][0], posicaoSegmentos[posicaoSegmentos.length - 1][1]};
         return posicaoCalda;
@@ -39,7 +41,7 @@ public class Snake {
                 } else if (linha == tabuleiro.length - 1) {
                     tabuleiro[linha][coluna] = (char) (64 + coluna) + " ";
                 } else {
-                    tabuleiro[linha][coluna] = "□ "; // TODO criar char tabuleiro variavel
+                    tabuleiro[linha][coluna] = caracterTabuleiro; // TODO criar char tabuleiro variavel
                 }
             }
         }
@@ -90,7 +92,7 @@ public class Snake {
     }
 
     public static int[] inputFruta(String[][] tabuleiro, Scanner scanner) {
-        System.out.println("Input");
+        System.out.println("Input fruta");
         String temp = scanner.next();
 
         String coordenadaNumerica = temp.substring(0, temp.length() - 1);
@@ -107,9 +109,10 @@ public class Snake {
         return inputFruta(tabuleiro, scanner);
     }
 
-    public static int[][] aumentarCobra(int[] inputCobra, int[][] posicaoSegmentos) {
+    public static int[][] aumentarCobra(int[] inputFruta, int[][] posicaoSegmentos) {
         int[][] novaPosicaoSegmentos = new int[posicaoSegmentos.length + 1][];
-        System.arraycopy(posicaoSegmentos, 0, novaPosicaoSegmentos, 0, posicaoSegmentos.length);
+        System.arraycopy(posicaoSegmentos, 0, novaPosicaoSegmentos, 1, posicaoSegmentos.length);
+        novaPosicaoSegmentos[0] = inputFruta;
         return novaPosicaoSegmentos;
     }
 
@@ -118,7 +121,7 @@ public class Snake {
     }
 
     public static int[][] iniciarCobra() { // TODO random?
-        int[][] posicaoSegmentos = {{10, 10}, {10, 11}, {10, 12}, {10, 13}};
+        int[][] posicaoSegmentos = {{10, 10}};
         return posicaoSegmentos;
     }
 
@@ -169,7 +172,7 @@ public class Snake {
     }
 
     public static String[][] test(String[][] tabuleiro, int[] posicaoCalda) {
-        tabuleiro[posicaoCalda[0]][posicaoCalda[1]] = "□ ";
+        tabuleiro[posicaoCalda[0]][posicaoCalda[1]] = caracterTabuleiro;
         return tabuleiro;
     }
 
@@ -189,12 +192,12 @@ public class Snake {
                 inputFruta = inputFruta(tabuleiro, scanner);
                 tabuleiro = colocarFruta(tabuleiro, inputFruta);
                 tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
+            } else {
+                int[] posicaoCalda = getPosicaoCalda(posicaoSegmentos);
+                posicaoSegmentos = moverCobra(inputCobra, posicaoSegmentos);
+                tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
+                tabuleiro = test(tabuleiro, posicaoCalda);
             }
-
-            int[] posicaoCalda = getPosicaoCalda(posicaoSegmentos);
-            posicaoSegmentos = moverCobra(inputCobra, posicaoSegmentos);
-            tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
-            tabuleiro = test(tabuleiro, posicaoCalda);
         }
     }
 
