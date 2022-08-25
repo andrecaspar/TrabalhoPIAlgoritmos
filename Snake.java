@@ -121,7 +121,7 @@ public class Snake {
     }
 
     public static int[][] iniciarCobra() { // TODO random?
-        int[][] posicaoSegmentos = {{10, 10}};
+        int[][] posicaoSegmentos = {{6, 6}};
         return posicaoSegmentos;
     }
 
@@ -224,5 +224,4 @@ public class Snake {
 }
 
 // ERRO tamanho teste 5, input fruta 5A
-// TODO muder de i e j pra l e c
 // TODO dificuldades com geracao mapas
