@@ -41,7 +41,7 @@ public class Snake {
                 } else if (linha == tabuleiro.length - 1) {
                     tabuleiro[linha][coluna] = (char) (64 + coluna) + " ";
                 } else {
-                    tabuleiro[linha][coluna] = caracterTabuleiro; // TODO criar char tabuleiro variavel
+                    tabuleiro[linha][coluna] = caracterTabuleiro;
                 }
             }
         }
@@ -58,29 +58,29 @@ public class Snake {
     }
 
     public static boolean podeComerFruta(String[][] tabuleiro, char inputCobra, int[][] posicoesSegmentos) {
-        String string;
+        String temp;
         switch (inputCobra) {
             case 'w' -> {
-                string = tabuleiro[posicoesSegmentos[0][0] - 1][posicoesSegmentos[0][1]];
-                if ("F ".equals(string)) {
+                temp = tabuleiro[posicoesSegmentos[0][0] - 1][posicoesSegmentos[0][1]];
+                if ("F ".equals(temp)) {
                     return true;
                 }
             }
             case 'a' -> {
-                string = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] - 1];
-                if ("F ".equals(string)) {
+                temp = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] - 1];
+                if ("F ".equals(temp)) {
                     return true;
                 }
             }
             case 's' -> {
-                string = tabuleiro[posicoesSegmentos[0][0] + 1][posicoesSegmentos[0][1]];
-                if ("F ".equals(string)) {
+                temp = tabuleiro[posicoesSegmentos[0][0] + 1][posicoesSegmentos[0][1]];
+                if ("F ".equals(temp)) {
                     return true;
                 }
             }
             case 'd' -> {
-                string = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] + 1];
-                if ("F ".equals(string)) {
+                temp = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] + 1];
+                if ("F ".equals(temp)) {
                     return true;
                 }
             }
@@ -171,20 +171,20 @@ public class Snake {
         return posicaoSegmentos;
     }
 
-    public static String[][] test(String[][] tabuleiro, int[] posicaoCalda) {
+    public static String[][] limparCalda(String[][] tabuleiro, int[] posicaoCalda) {
         tabuleiro[posicaoCalda[0]][posicaoCalda[1]] = caracterTabuleiro;
         return tabuleiro;
     }
 
     public static boolean checarColisao(int[][] posicaoSegmentos, int tamanhoTabuleiro) {
+        if (posicaoSegmentos[0][0] == tamanhoTabuleiro - 1 || posicaoSegmentos[0][1] == 0) {
+            return true;
+        }
         for (int i = 0; i < posicaoSegmentos.length; i++) {
             for (int j = i + 1; j < posicaoSegmentos.length; j++) {
                 if (posicaoSegmentos[i][0] == posicaoSegmentos[j][0] && posicaoSegmentos[i][1] == posicaoSegmentos[j][1]) {
                     return true;
                 }
-            }
-            if (posicaoSegmentos[i][1] == 0 || posicaoSegmentos[i][0] == tamanhoTabuleiro - 1) {
-                return true;
             }
         }
         return false;
@@ -211,7 +211,7 @@ public class Snake {
                 int[] posicaoCalda = getPosicaoCalda(posicaoSegmentos);
                 posicaoSegmentos = moverCobra(inputCobra, posicaoSegmentos);
                 tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
-                tabuleiro = test(tabuleiro, posicaoCalda);
+                tabuleiro = limparCalda(tabuleiro, posicaoCalda);
             }
 
             rodando = !checarColisao(posicaoSegmentos, tamanhoTabuleiro);
