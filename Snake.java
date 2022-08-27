@@ -49,7 +49,7 @@ public class Snake {
     }
 
     public static boolean posicaoValida(int[] input, int tamanhoTabuleiro) {
-        return true; // TODO
+        return !(input[0] >= tamanhoTabuleiro || input[1] >= tamanhoTabuleiro);
     }
 
     public static String[][] colocarFruta(String[][] tabuleiro, int[] inputFruta) {
@@ -121,7 +121,7 @@ public class Snake {
     }
 
     public static int[][] iniciarCobra() { // TODO random?
-        int[][] posicaoSegmentos = {{6, 6}};
+        int[][] posicaoSegmentos = {{6, 3}};
         return posicaoSegmentos;
     }
 
@@ -176,13 +176,28 @@ public class Snake {
         return tabuleiro;
     }
 
-    public static void gameLoop(String[][] tabuleiro, Scanner scanner, int[][] posicaoSegmentos) {
+    public static boolean checarColisao(int[][] posicaoSegmentos, int tamanhoTabuleiro) {
+        for (int i = 0; i < posicaoSegmentos.length; i++) {
+            for (int j = i + 1; j < posicaoSegmentos.length; j++) {
+                if (posicaoSegmentos[i][0] == posicaoSegmentos[j][0] && posicaoSegmentos[i][1] == posicaoSegmentos[j][1]) {
+                    return true;
+                }
+            }
+            if (posicaoSegmentos[i][1] == 0 || posicaoSegmentos[i][0] == tamanhoTabuleiro - 1) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void gameLoop(String[][] tabuleiro, Scanner scanner, int[][] posicaoSegmentos, int tamanhoTabuleiro) {
         char inputCobra;
         int[] inputFruta = inputFruta(tabuleiro, scanner);
         tabuleiro = colocarFruta(tabuleiro, inputFruta);
         tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
 
-        while (true) {
+        boolean rodando = true;
+        while (rodando) {
             printarTabuleiro(tabuleiro);
 
             inputCobra = inputCobra(scanner);
@@ -198,6 +213,8 @@ public class Snake {
                 tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
                 tabuleiro = test(tabuleiro, posicaoCalda);
             }
+
+            rodando = !checarColisao(posicaoSegmentos, tamanhoTabuleiro);
         }
     }
 
@@ -219,9 +236,9 @@ public class Snake {
 
         int[][] posicaoSegmentos = iniciarCobra();
 
-        gameLoop(tabuleiro, scanner, posicaoSegmentos);
+        gameLoop(tabuleiro, scanner, posicaoSegmentos, tamanhoTabuleiro);
     }
 }
 
-// ERRO tamanho teste 5, input fruta 5A
 // TODO dificuldades com geracao mapas
+// TODO bug 2 segmentos colisao
