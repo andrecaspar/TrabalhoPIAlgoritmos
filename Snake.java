@@ -1,5 +1,6 @@
 package com.alls.snake;
 
+import java.util.Random;
 import java.util.Scanner;
 
 public class Snake {
@@ -7,8 +8,14 @@ public class Snake {
     public static String caracterTabuleiro = "  "; // TODO fazer espaço fixo nas funcoes
 
     public static int[] getPosicaoCalda(int[][] posicaoSegmentos) { // TODO refactor
-        int[] posicaoCalda = {posicaoSegmentos[posicaoSegmentos.length - 1][0], posicaoSegmentos[posicaoSegmentos.length - 1][1]};
+        int[] posicaoCalda = { posicaoSegmentos[posicaoSegmentos.length - 1][0],
+                posicaoSegmentos[posicaoSegmentos.length - 1][1] };
         return posicaoCalda;
+    }
+
+    public static void limparTerminal() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
     public static void printarTabuleiro(String[][] tabuleiro) {
@@ -54,6 +61,13 @@ public class Snake {
 
     public static String[][] colocarFruta(String[][] tabuleiro, int[] inputFruta) {
         tabuleiro[inputFruta[0]][inputFruta[1]] = "F "; // TODO criar char fruta
+        return tabuleiro;
+    }
+
+    public static String[][] colocarObstaculos(String[][] tabuleiro, int[][] posicaoObstaculos) {
+        for (int i = 0; i < posicaoObstaculos.length; i++) {
+            tabuleiro[posicaoObstaculos[i][0]][posicaoObstaculos[i][1]] = "X ";
+        }
         return tabuleiro;
     }
 
@@ -121,7 +135,7 @@ public class Snake {
     }
 
     public static int[][] iniciarCobra() { // TODO random?
-        int[][] posicaoSegmentos = {{6, 3}};
+        int[][] posicaoSegmentos = { { 6, 3 } };
         return posicaoSegmentos;
     }
 
@@ -141,33 +155,27 @@ public class Snake {
         return posicaoSegmentos;
     }
 
-    public static int[][] moverCobra(char inputCobra, int[][] posicaoSegmentos) {
-        int[][] temp = new int[posicaoSegmentos.length][2];
-        for (int i = 0; i < posicaoSegmentos.length; i++) {
-            System.arraycopy(posicaoSegmentos[i], 0, temp[i], 0, posicaoSegmentos[i].length);
-        }
-
+    public static int[][] avancarCabeca(char inputCobra, int[][] posicaoSegmentos) {
         switch (inputCobra) {
             case 'w' -> {
-                posicaoSegmentos[0][0] = temp[0][0] - 1;
+                posicaoSegmentos[0][0] = posicaoSegmentos[0][0] - 1;
                 break;
             }
             case 'a' -> {
-                posicaoSegmentos[0][1] = temp[0][1] - 1;
+                posicaoSegmentos[0][1] = posicaoSegmentos[0][1] - 1;
                 break;
             }
             case 's' -> {
-                posicaoSegmentos[0][0] = temp[0][0] + 1;
+                posicaoSegmentos[0][0] = posicaoSegmentos[0][0] + 1;
                 break;
             }
             case 'd' -> {
-                posicaoSegmentos[0][1] = temp[0][1] + 1;
+                posicaoSegmentos[0][1] = posicaoSegmentos[0][1] + 1;
                 break;
             }
             default -> {
             }
         }
-        posicaoSegmentos = avancarSegmentos(posicaoSegmentos, temp);
         return posicaoSegmentos;
     }
 
@@ -176,13 +184,45 @@ public class Snake {
         return tabuleiro;
     }
 
-    public static boolean checarColisao(int[][] posicaoSegmentos, int tamanhoTabuleiro) {
+    public static String[][] moverCobra(String[][] tabuleiro, int[][] posicaoSegmentos, int[] posicaoCalda) {
+        tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
+        tabuleiro = limparCalda(tabuleiro, posicaoCalda);
+        return tabuleiro;
+    }
+
+    public static int[][] novaPosicaoSegmentos(char inputCobra, int[][] posicaoSegmentos) {
+        int[][] backupPosicaoSegmentos = new int[posicaoSegmentos.length][2];
+        for (int i = 0; i < posicaoSegmentos.length; i++) {
+            System.arraycopy(posicaoSegmentos[i], 0, backupPosicaoSegmentos[i], 0, posicaoSegmentos[i].length);
+        }
+
+        posicaoSegmentos = avancarCabeca(inputCobra, posicaoSegmentos);
+        posicaoSegmentos = avancarSegmentos(posicaoSegmentos, backupPosicaoSegmentos);
+        return posicaoSegmentos;
+    }
+
+    public static String[][] comerFruta(String[][] tabuleiro, int[] inputFruta, int[][] posicaoSegmentos) {
+        tabuleiro = colocarFruta(tabuleiro, inputFruta);
+        tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
+        return tabuleiro;
+    }
+
+    public static boolean checarColisao(int[][] posicaoSegmentos, int[][] posicaoObstaculos, int tamanhoTabuleiro) {
         if (posicaoSegmentos[0][0] == tamanhoTabuleiro - 1 || posicaoSegmentos[0][1] == 0) {
             return true;
         }
         for (int i = 0; i < posicaoSegmentos.length; i++) {
             for (int j = i + 1; j < posicaoSegmentos.length; j++) {
-                if (posicaoSegmentos[i][0] == posicaoSegmentos[j][0] && posicaoSegmentos[i][1] == posicaoSegmentos[j][1]) {
+                if (posicaoSegmentos[i][0] == posicaoSegmentos[j][0]
+                        && posicaoSegmentos[i][1] == posicaoSegmentos[j][1]) {
+                    return true;
+                }
+            }
+        }
+        for (int i = 0; i < posicaoObstaculos.length; i++) {
+            for (int j = 0; j < posicaoSegmentos.length; j++) {
+                if (posicaoObstaculos[i][0] == posicaoSegmentos[j][0]
+                        && posicaoObstaculos[i][1] == posicaoSegmentos[j][1]) {
                     return true;
                 }
             }
@@ -190,14 +230,17 @@ public class Snake {
         return false;
     }
 
-    public static void gameLoop(String[][] tabuleiro, Scanner scanner, int[][] posicaoSegmentos, int tamanhoTabuleiro) {
+    public static void loopJogo(String[][] tabuleiro, Scanner scanner, int[][] posicaoSegmentos,
+            int[][] posicaoObstaculos, int tamanhoTabuleiro) {
         char inputCobra;
         int[] inputFruta = inputFruta(tabuleiro, scanner);
         tabuleiro = colocarFruta(tabuleiro, inputFruta);
         tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
+        tabuleiro = colocarObstaculos(tabuleiro, posicaoObstaculos);
 
         boolean rodando = true;
         while (rodando) {
+            limparTerminal();
             printarTabuleiro(tabuleiro);
 
             inputCobra = inputCobra(scanner);
@@ -205,17 +248,29 @@ public class Snake {
             if (podeComerFruta(tabuleiro, inputCobra, posicaoSegmentos)) {
                 posicaoSegmentos = aumentarCobra(inputFruta, posicaoSegmentos);
                 inputFruta = inputFruta(tabuleiro, scanner);
-                tabuleiro = colocarFruta(tabuleiro, inputFruta);
-                tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
+                tabuleiro = comerFruta(tabuleiro, inputFruta, posicaoSegmentos);
             } else {
                 int[] posicaoCalda = getPosicaoCalda(posicaoSegmentos);
-                posicaoSegmentos = moverCobra(inputCobra, posicaoSegmentos);
-                tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
-                tabuleiro = limparCalda(tabuleiro, posicaoCalda);
+                posicaoSegmentos = novaPosicaoSegmentos(inputCobra, posicaoSegmentos);
+                tabuleiro = moverCobra(tabuleiro, posicaoSegmentos, posicaoCalda);
             }
 
-            rodando = !checarColisao(posicaoSegmentos, tamanhoTabuleiro);
+            rodando = !checarColisao(posicaoSegmentos, posicaoObstaculos, tamanhoTabuleiro);
         }
+    }
+
+    public static int[][] gerarObstaculos(int tamanhoTabuleiro, int dificuldade) {
+        Random random = new Random();
+        int temp = random.nextInt(dificuldade);
+
+        int[][] posicaoObstaculos = new int[temp][2];
+
+        for (int i = 0; i < posicaoObstaculos.length; i++) {
+            posicaoObstaculos[i][0] = random.nextInt(tamanhoTabuleiro);
+            posicaoObstaculos[i][1] = random.nextInt(tamanhoTabuleiro);
+        }
+
+        return posicaoObstaculos;
     }
 
     public static void main(String[] args) {
@@ -225,20 +280,30 @@ public class Snake {
         int tamanhoTabuleiro = scanner.nextInt() + 1;
 
         if (tamanhoTabuleiro > 27) {
-            System.out.println("max 26");
+            System.out.println("O tamanho maximo possivel eh 26. Esse sera o valor atribuido.");
             tamanhoTabuleiro = 27;
         } else if (tamanhoTabuleiro < 8) {
-            System.out.println("min 7");
+            System.out.println("O tamanho minimo possivel eh 7. Esse sera o valor atribuido.");
             tamanhoTabuleiro = 8;
         }
+
+        System.out.println("Insira dificuldade 0 - 5:");
+        int dificuldade = scanner.nextInt() * 20;
 
         String[][] tabuleiro = preencherTabuleiro(tamanhoTabuleiro);
 
         int[][] posicaoSegmentos = iniciarCobra();
+        int[][] posicaoObstaculos = {};
 
-        gameLoop(tabuleiro, scanner, posicaoSegmentos, tamanhoTabuleiro);
+        if (dificuldade != 0) {
+            posicaoObstaculos = gerarObstaculos(tamanhoTabuleiro, dificuldade);
+        }
+
+        loopJogo(tabuleiro, scanner, posicaoSegmentos, posicaoObstaculos, tamanhoTabuleiro);
     }
 }
 
 // TODO dificuldades com geracao mapas
 // TODO bug 2 segmentos colisao
+// TODO bug when 4 segs, e faz quadrado, cabeça limpada cause cabeça = cauda.
+// Checar pra n limpar
