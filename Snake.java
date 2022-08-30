@@ -1,4 +1,4 @@
-package com.alls.snake;
+package com.alls.snake.snake;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -8,8 +8,8 @@ public class Snake {
     public static String caracterTabuleiro = "  "; // TODO fazer espaço fixo nas funcoes
 
     public static int[] getPosicaoCalda(int[][] posicaoSegmentos) { // TODO refactor
-        int[] posicaoCalda = { posicaoSegmentos[posicaoSegmentos.length - 1][0],
-                posicaoSegmentos[posicaoSegmentos.length - 1][1] };
+        int[] posicaoCalda = {posicaoSegmentos[posicaoSegmentos.length - 1][0],
+            posicaoSegmentos[posicaoSegmentos.length - 1][1]};
         return posicaoCalda;
     }
 
@@ -55,8 +55,14 @@ public class Snake {
         return tabuleiro;
     }
 
-    public static boolean posicaoValida(int[] input, int tamanhoTabuleiro) {
-        return !(input[0] >= tamanhoTabuleiro || input[1] >= tamanhoTabuleiro);
+    public static boolean posicaoValida(int[] input, int[][] posicaoSegmentos, int tamanhoTabuleiro) {
+        for (int i = 0; i < posicaoSegmentos.length; i++) {
+            if (posicaoSegmentos[i][0] == input[0] && posicaoSegmentos[i][1] == input[1]) {
+                return false;
+            }
+        }
+        return !(input[0] >= tamanhoTabuleiro - 1 || input[1] >= tamanhoTabuleiro - 1 || input[0] <= 0
+                || input[1] <= 0);
     }
 
     public static String[][] colocarFruta(String[][] tabuleiro, int[] inputFruta) {
@@ -105,22 +111,26 @@ public class Snake {
         return false;
     }
 
-    public static int[] inputFruta(String[][] tabuleiro, Scanner scanner) {
+    public static int[] inputFruta(String[][] tabuleiro, int[][] posicaoSegmentos, Scanner scanner) {
         System.out.println("Input fruta");
-        String temp = scanner.next();
+        String temp = scanner.next().toUpperCase();
 
-        String coordenadaNumerica = temp.substring(0, temp.length() - 1);
-        char coordenadaAlfabetica = temp.charAt(temp.length() - 1);
+        if (temp.length() == 2 || temp.length() == 3) {
+            String coordenadaNumerica = temp.substring(0, temp.length() - 1);
+            char coordenadaAlfabetica = temp.charAt(temp.length() - 1);
 
-        int[] input = new int[2];
-        input[0] = Integer.parseInt(coordenadaNumerica) - 1;
-        input[1] = coordenadaAlfabetica - 64;
+            if (coordenadaAlfabetica >= '0') {
+                int[] input = new int[2];
+                input[0] = Integer.parseInt(coordenadaNumerica) - 1;
+                input[1] = coordenadaAlfabetica - 64;
 
-        if (posicaoValida(input, tabuleiro.length)) {
-            return input;
+                if (posicaoValida(input, posicaoSegmentos, tabuleiro.length)) {
+                    return input;
+                }
+            }
         }
         System.out.println("Input n valido");
-        return inputFruta(tabuleiro, scanner);
+        return inputFruta(tabuleiro, posicaoSegmentos, scanner);
     }
 
     public static int[][] aumentarCobra(int[] inputFruta, int[][] posicaoSegmentos) {
@@ -135,7 +145,7 @@ public class Snake {
     }
 
     public static int[][] iniciarCobra() { // TODO random?
-        int[][] posicaoSegmentos = { { 6, 3 } };
+        int[][] posicaoSegmentos = {{6, 3}};
         return posicaoSegmentos;
     }
 
@@ -233,7 +243,7 @@ public class Snake {
     public static void loopJogo(String[][] tabuleiro, Scanner scanner, int[][] posicaoSegmentos,
             int[][] posicaoObstaculos, int tamanhoTabuleiro) {
         char inputCobra;
-        int[] inputFruta = inputFruta(tabuleiro, scanner);
+        int[] inputFruta = inputFruta(tabuleiro, posicaoSegmentos, scanner);
         tabuleiro = colocarFruta(tabuleiro, inputFruta);
         tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
         tabuleiro = colocarObstaculos(tabuleiro, posicaoObstaculos);
@@ -247,7 +257,7 @@ public class Snake {
 
             if (podeComerFruta(tabuleiro, inputCobra, posicaoSegmentos)) {
                 posicaoSegmentos = aumentarCobra(inputFruta, posicaoSegmentos);
-                inputFruta = inputFruta(tabuleiro, scanner);
+                inputFruta = inputFruta(tabuleiro, posicaoSegmentos, scanner);
                 tabuleiro = comerFruta(tabuleiro, inputFruta, posicaoSegmentos);
             } else {
                 int[] posicaoCalda = getPosicaoCalda(posicaoSegmentos);
@@ -266,8 +276,9 @@ public class Snake {
         int[][] posicaoObstaculos = new int[temp][2];
 
         for (int i = 0; i < posicaoObstaculos.length; i++) {
-            posicaoObstaculos[i][0] = random.nextInt(tamanhoTabuleiro);
-            posicaoObstaculos[i][1] = random.nextInt(tamanhoTabuleiro);
+            posicaoObstaculos[i][0] = Math.max(0, random.nextInt(tamanhoTabuleiro) - 1);
+            posicaoObstaculos[i][1] = Math.max(1, random.nextInt(tamanhoTabuleiro));
+
         }
 
         return posicaoObstaculos;
@@ -303,7 +314,8 @@ public class Snake {
     }
 }
 
-// TODO dificuldades com geracao mapas
 // TODO bug 2 segmentos colisao
-// TODO bug when 4 segs, e faz quadrado, cabeça limpada cause cabeça = cauda.
-// Checar pra n limpar
+// TODO bug when 4 segs, e faz quadrado, cabeça limpada cause cabeça = cauda
+// TODO out of bounds fruta
+// TODO pao de queijo
+// TODO bug fruta input so letras
