@@ -1,4 +1,4 @@
-package com.alls.snake.snake;
+package com.alls.snake;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -6,6 +6,7 @@ import java.util.Scanner;
 public class Snake {
 
     public static String caracterTabuleiro = "  "; // TODO fazer espaço fixo nas funcoes
+    public static String caracterFruta = "F ";
 
     public static int[] getPosicaoCalda(int[][] posicaoSegmentos) { // TODO refactor
         int[] posicaoCalda = {posicaoSegmentos[posicaoSegmentos.length - 1][0],
@@ -61,12 +62,12 @@ public class Snake {
                 return false;
             }
         }
-        return !(input[0] >= tamanhoTabuleiro - 1 || input[1] >= tamanhoTabuleiro - 1 || input[0] <= 0
+        return !(input[0] >= tamanhoTabuleiro - 1 || input[1] > tamanhoTabuleiro - 1 || input[0] < 0
                 || input[1] <= 0);
     }
 
     public static String[][] colocarFruta(String[][] tabuleiro, int[] inputFruta) {
-        tabuleiro[inputFruta[0]][inputFruta[1]] = "F "; // TODO criar char fruta
+        tabuleiro[inputFruta[0]][inputFruta[1]] = caracterFruta; // TODO criar char fruta
         return tabuleiro;
     }
 
@@ -82,25 +83,25 @@ public class Snake {
         switch (inputCobra) {
             case 'w' -> {
                 temp = tabuleiro[posicoesSegmentos[0][0] - 1][posicoesSegmentos[0][1]];
-                if ("F ".equals(temp)) {
+                if (caracterFruta.equals(temp)) {
                     return true;
                 }
             }
             case 'a' -> {
                 temp = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] - 1];
-                if ("F ".equals(temp)) {
+                if (caracterFruta.equals(temp)) {
                     return true;
                 }
             }
             case 's' -> {
                 temp = tabuleiro[posicoesSegmentos[0][0] + 1][posicoesSegmentos[0][1]];
-                if ("F ".equals(temp)) {
+                if (caracterFruta.equals(temp)) {
                     return true;
                 }
             }
             case 'd' -> {
                 temp = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] + 1];
-                if ("F ".equals(temp)) {
+                if (caracterFruta.equals(temp)) {
                     return true;
                 }
             }
@@ -244,9 +245,9 @@ public class Snake {
             int[][] posicaoObstaculos, int tamanhoTabuleiro) {
         char inputCobra;
         int[] inputFruta = inputFruta(tabuleiro, posicaoSegmentos, scanner);
-        tabuleiro = colocarFruta(tabuleiro, inputFruta);
-        tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
         tabuleiro = colocarObstaculos(tabuleiro, posicaoObstaculos);
+        tabuleiro = colocarSegmentos(tabuleiro, posicaoSegmentos);
+        tabuleiro = colocarFruta(tabuleiro, inputFruta);
 
         boolean rodando = true;
         while (rodando) {
@@ -316,6 +317,5 @@ public class Snake {
 
 // TODO bug 2 segmentos colisao
 // TODO bug when 4 segs, e faz quadrado, cabeça limpada cause cabeça = cauda
-// TODO out of bounds fruta
 // TODO pao de queijo
 // TODO bug fruta input so letras
