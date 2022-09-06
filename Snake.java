@@ -1,16 +1,19 @@
-package com.alls.snake;
+package com.alls.snake.snake;
 
 import java.util.Random;
 import java.util.Scanner;
 
+// custom skins
 public class Snake {
 
-    public static String caracterTabuleiro = "  "; // TODO fazer espaço fixo nas funcoes
-    public static String caracterFruta = "F ";
+    public static char caracterTabuleiro = ' '; // TODO fazer espaço fixo nas funcoes
+    public static char caracterFruta = 'F';
+    public static char caracterCabeca = 'o';
+    public static char caracterCorpo = 'O';
 
     public static int[] getPosicaoCalda(int[][] posicaoSegmentos) { // TODO refactor
-        int[] posicaoCalda = {posicaoSegmentos[posicaoSegmentos.length - 1][0],
-            posicaoSegmentos[posicaoSegmentos.length - 1][1]};
+        int[] posicaoCalda = { posicaoSegmentos[posicaoSegmentos.length - 1][0],
+                posicaoSegmentos[posicaoSegmentos.length - 1][1] };
         return posicaoCalda;
     }
 
@@ -49,7 +52,7 @@ public class Snake {
                 } else if (linha == tabuleiro.length - 1) {
                     tabuleiro[linha][coluna] = (char) (64 + coluna) + " ";
                 } else {
-                    tabuleiro[linha][coluna] = caracterTabuleiro;
+                    tabuleiro[linha][coluna] = caracterTabuleiro + " ";
                 }
             }
         }
@@ -67,7 +70,7 @@ public class Snake {
     }
 
     public static String[][] colocarFruta(String[][] tabuleiro, int[] inputFruta) {
-        tabuleiro[inputFruta[0]][inputFruta[1]] = caracterFruta; // TODO criar char fruta
+        tabuleiro[inputFruta[0]][inputFruta[1]] = caracterFruta + " "; // TODO criar char fruta
         return tabuleiro;
     }
 
@@ -83,27 +86,31 @@ public class Snake {
         switch (inputCobra) {
             case 'w' -> {
                 temp = tabuleiro[posicoesSegmentos[0][0] - 1][posicoesSegmentos[0][1]];
-                if (caracterFruta.equals(temp)) {
+                if ((caracterFruta + " ").equals(temp)) {
                     return true;
                 }
+                break;
             }
             case 'a' -> {
                 temp = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] - 1];
-                if (caracterFruta.equals(temp)) {
+                if ((caracterFruta + " ").equals(temp)) {
                     return true;
                 }
+                break;
             }
             case 's' -> {
                 temp = tabuleiro[posicoesSegmentos[0][0] + 1][posicoesSegmentos[0][1]];
-                if (caracterFruta.equals(temp)) {
+                if ((caracterFruta + " ").equals(temp)) {
                     return true;
                 }
+                break;
             }
             case 'd' -> {
                 temp = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] + 1];
-                if (caracterFruta.equals(temp)) {
+                if ((caracterFruta + " ").equals(temp)) {
                     return true;
                 }
+                break;
             }
             default -> {
                 return false;
@@ -113,7 +120,7 @@ public class Snake {
     }
 
     public static int[] inputFruta(String[][] tabuleiro, int[][] posicaoSegmentos, Scanner scanner) {
-        System.out.println("Input fruta");
+        System.out.println("Insira a coordenada da fruta (numero seguido de letra, exemplo: 1a).");
         String temp = scanner.next().toUpperCase();
 
         if (temp.length() == 2 || temp.length() == 3) {
@@ -122,7 +129,14 @@ public class Snake {
 
             if (coordenadaAlfabetica >= '0') {
                 int[] input = new int[2];
-                input[0] = Integer.parseInt(coordenadaNumerica) - 1;
+
+                try {
+                    input[0] = Integer.parseInt(coordenadaNumerica) - 1;
+                } catch (final NumberFormatException e) {
+                    System.out.println("Input de fruta nao valido, insira novamente.");
+                    return inputFruta(tabuleiro, posicaoSegmentos, scanner);
+                }
+
                 input[1] = coordenadaAlfabetica - 64;
 
                 if (posicaoValida(input, posicaoSegmentos, tabuleiro.length)) {
@@ -130,7 +144,7 @@ public class Snake {
                 }
             }
         }
-        System.out.println("Input n valido");
+        System.out.println("Input de fruta nao valido, insira novamente.");
         return inputFruta(tabuleiro, posicaoSegmentos, scanner);
     }
 
@@ -145,15 +159,50 @@ public class Snake {
         return scanner.next().charAt(0);
     }
 
-    public static int[][] iniciarCobra() { // TODO random?
-        int[][] posicaoSegmentos = {{6, 3}};
-        return posicaoSegmentos;
+    public static int[][] iniciarCobra(Scanner scanner, int tamanhoTabuleiro) {
+        System.out.println("Insira a coordenada inicial da cobra (numero seguido de letra, exemplo: 1a).");
+        String temp = scanner.next().toUpperCase();
+
+        if (temp.length() == 2 || temp.length() == 3) {
+            String coordenadaNumerica = temp.substring(0, temp.length() - 1);
+            char coordenadaAlfabetica = temp.charAt(temp.length() - 1);
+
+            if (coordenadaAlfabetica >= '0') {
+                int[][] input = new int[1][2];
+
+                try {
+                    input[0][0] = Integer.parseInt(coordenadaNumerica) - 1;
+                } catch (final NumberFormatException e) {
+                    System.out.println("Input nao valido, insira novamente.");
+                    return iniciarCobra(scanner, tamanhoTabuleiro);
+                }
+
+                input[0][1] = coordenadaAlfabetica - 64;
+
+                if (input[0][0] < tamanhoTabuleiro && input[0][0] >= 0 && input[0][1] < tamanhoTabuleiro
+                        && input[0][1] >= 0) {
+                    return input;
+                }
+            }
+        }
+        System.out.println("Input nao valido, insira novamente.");
+        return iniciarCobra(scanner, tamanhoTabuleiro);
+    }
+
+    public static int inputDificuldade(Scanner scanner) {
+        System.out.println("\nInsira a dificuldade.\n0 significa nenhum obstaculo.\n5 eh a dificuldade maxima.");
+        int dificuldade = scanner.nextInt();
+        if (dificuldade > 5 && dificuldade < 0) {
+            System.out.println("Dificuldade nao valida. Insira novamente.");
+            return inputDificuldade(scanner);
+        }
+        return dificuldade;
     }
 
     public static String[][] colocarSegmentos(String[][] tabuleiro, int[][] posicaoSegmentos) {
-        tabuleiro[posicaoSegmentos[0][0]][posicaoSegmentos[0][1]] = "o ";
+        tabuleiro[posicaoSegmentos[0][0]][posicaoSegmentos[0][1]] = caracterCabeca + " ";
         for (int i = 1; i < posicaoSegmentos.length; i++) {
-            tabuleiro[posicaoSegmentos[i][0]][posicaoSegmentos[i][1]] = "O ";
+            tabuleiro[posicaoSegmentos[i][0]][posicaoSegmentos[i][1]] = caracterCorpo + " ";
         }
         return tabuleiro;
     }
@@ -185,13 +234,14 @@ public class Snake {
                 break;
             }
             default -> {
+                break;
             }
         }
         return posicaoSegmentos;
     }
 
     public static String[][] limparCalda(String[][] tabuleiro, int[] posicaoCalda) {
-        tabuleiro[posicaoCalda[0]][posicaoCalda[1]] = caracterTabuleiro;
+        tabuleiro[posicaoCalda[0]][posicaoCalda[1]] = caracterTabuleiro + " ";
         return tabuleiro;
     }
 
@@ -208,6 +258,7 @@ public class Snake {
         }
 
         posicaoSegmentos = avancarCabeca(inputCobra, posicaoSegmentos);
+        System.out.println(posicaoSegmentos);
         posicaoSegmentos = avancarSegmentos(posicaoSegmentos, backupPosicaoSegmentos);
         return posicaoSegmentos;
     }
@@ -279,16 +330,49 @@ public class Snake {
         for (int i = 0; i < posicaoObstaculos.length; i++) {
             posicaoObstaculos[i][0] = Math.max(0, random.nextInt(tamanhoTabuleiro) - 1);
             posicaoObstaculos[i][1] = Math.max(1, random.nextInt(tamanhoTabuleiro));
-
         }
 
         return posicaoObstaculos;
     }
 
+    public static void skinCobra(Scanner scanner) {
+        System.out.println("Insira o caracter da cabeca da cobra. \"o\" sera usado caso insira \"X\"");
+        caracterCabeca = scanner.next().charAt(0);
+        if (caracterCabeca == 'X') {
+            caracterCabeca = 'o';
+        }
+
+        System.out.println("Insira o caracter do corpo da cobra. \"O\" sera usado caso insira \"X\"");
+        caracterCorpo = scanner.next().charAt(0);
+        if (caracterCorpo == 'X') {
+            caracterCorpo = 'O';
+        }
+    }
+
+    public static void printarSnake() {
+        System.out.println("  .-^-.");
+        System.out.println(" /     \\       .- ~ ~ -.");
+        System.out.println("()     ()     /   _ _   `.                    _ _ _");
+        System.out.println(" \\_   _/    /  /       \\  \\                . ~  _ _  ~ .");
+        System.out.println("   | |     /  /         \\  \\             .' .~       ~-. `.");
+        System.out.println("   | |    /  /          )   )           /  /             `.`.");
+        System.out.println("   \\ \\_ _/  /          /   /           /  /                `'");
+        System.out.println("    \\_ _ _.'          /   /           (  (");
+        System.out.println("                     /   /            \\  \\");
+        System.out.println("                    /   /              \\  \\");
+        System.out.println("                   /   /                 )  )");
+        System.out.println("                  (   (                 /  /");
+        System.out.println("                   `.  `.             .'  /");
+        System.out.println("                    `.   ~ - - - - ~   .'");
+        System.out.println("                       ~ . _ _ _ _ . ~");
+
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Insira tamanho tabuleiro:");
+        printarSnake();
+        System.out.println("\nMova com wasd\nInsira o tamanho do tabuleiro:");
         int tamanhoTabuleiro = scanner.nextInt() + 1;
 
         if (tamanhoTabuleiro > 27) {
@@ -299,12 +383,13 @@ public class Snake {
             tamanhoTabuleiro = 8;
         }
 
-        System.out.println("Insira dificuldade 0 - 5:");
-        int dificuldade = scanner.nextInt() * 20;
+        int dificuldade = inputDificuldade(scanner);
+
+        skinCobra(scanner);
 
         String[][] tabuleiro = preencherTabuleiro(tamanhoTabuleiro);
 
-        int[][] posicaoSegmentos = iniciarCobra();
+        int[][] posicaoSegmentos = iniciarCobra(scanner, tamanhoTabuleiro);
         int[][] posicaoObstaculos = {};
 
         if (dificuldade != 0) {
@@ -312,6 +397,7 @@ public class Snake {
         }
 
         loopJogo(tabuleiro, scanner, posicaoSegmentos, posicaoObstaculos, tamanhoTabuleiro);
+        System.out.println("FIM DE JOGO!");
     }
 }
 
