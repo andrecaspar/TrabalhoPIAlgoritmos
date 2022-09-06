@@ -3,15 +3,14 @@ package com.alls.snake.snake;
 import java.util.Random;
 import java.util.Scanner;
 
-// custom skins
 public class Snake {
 
-    public static char caracterTabuleiro = ' '; // TODO fazer espaço fixo nas funcoes
+    public static char caracterTabuleiro = ' ';
     public static char caracterFruta = 'F';
     public static char caracterCabeca = 'o';
     public static char caracterCorpo = 'O';
 
-    public static int[] getPosicaoCalda(int[][] posicaoSegmentos) { // TODO refactor
+    public static int[] getPosicaoCalda(int[][] posicaoSegmentos) {
         int[] posicaoCalda = { posicaoSegmentos[posicaoSegmentos.length - 1][0],
                 posicaoSegmentos[posicaoSegmentos.length - 1][1] };
         return posicaoCalda;
@@ -31,7 +30,7 @@ public class Snake {
         }
     }
 
-    public static String[][] preencherTabuleiro(int tamanhoTabuleiro) { // TODO refactor
+    public static String[][] preencherTabuleiro(int tamanhoTabuleiro) {
         String[][] tabuleiro = new String[tamanhoTabuleiro][tamanhoTabuleiro];
         for (int linha = 0; linha < tabuleiro.length; linha++) {
             for (int coluna = 0; coluna < tabuleiro.length; coluna++) {
@@ -70,7 +69,7 @@ public class Snake {
     }
 
     public static String[][] colocarFruta(String[][] tabuleiro, int[] inputFruta) {
-        tabuleiro[inputFruta[0]][inputFruta[1]] = caracterFruta + " "; // TODO criar char fruta
+        tabuleiro[inputFruta[0]][inputFruta[1]] = caracterFruta + " ";
         return tabuleiro;
     }
 
@@ -85,28 +84,44 @@ public class Snake {
         String temp;
         switch (inputCobra) {
             case 'w' -> {
-                temp = tabuleiro[posicoesSegmentos[0][0] - 1][posicoesSegmentos[0][1]];
+                try {
+                    temp = tabuleiro[posicoesSegmentos[0][0] - 1][posicoesSegmentos[0][1]];
+                } catch (ArrayIndexOutOfBoundsException exception) {
+                    return false;
+                }
                 if ((caracterFruta + " ").equals(temp)) {
                     return true;
                 }
                 break;
             }
             case 'a' -> {
-                temp = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] - 1];
+                try {
+                    temp = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] - 1];
+                } catch (ArrayIndexOutOfBoundsException exception) {
+                    return false;
+                }
                 if ((caracterFruta + " ").equals(temp)) {
                     return true;
                 }
                 break;
             }
             case 's' -> {
-                temp = tabuleiro[posicoesSegmentos[0][0] + 1][posicoesSegmentos[0][1]];
+                try {
+                    temp = tabuleiro[posicoesSegmentos[0][0] + 1][posicoesSegmentos[0][1]];
+                } catch (ArrayIndexOutOfBoundsException exception) {
+                    return false;
+                }
                 if ((caracterFruta + " ").equals(temp)) {
                     return true;
                 }
                 break;
             }
             case 'd' -> {
-                temp = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] + 1];
+                try {
+                    temp = tabuleiro[posicoesSegmentos[0][0]][posicoesSegmentos[0][1] + 1];
+                } catch (ArrayIndexOutOfBoundsException exception) {
+                    return false;
+                }
                 if ((caracterFruta + " ").equals(temp)) {
                     return true;
                 }
@@ -192,7 +207,7 @@ public class Snake {
     public static int inputDificuldade(Scanner scanner) {
         System.out.println("\nInsira a dificuldade.\n0 significa nenhum obstaculo.\n5 eh a dificuldade maxima.");
         int dificuldade = scanner.nextInt();
-        if (dificuldade > 5 && dificuldade < 0) {
+        if (dificuldade > 5 || dificuldade < 0) {
             System.out.println("Dificuldade nao valida. Insira novamente.");
             return inputDificuldade(scanner);
         }
@@ -200,9 +215,13 @@ public class Snake {
     }
 
     public static String[][] colocarSegmentos(String[][] tabuleiro, int[][] posicaoSegmentos) {
-        tabuleiro[posicaoSegmentos[0][0]][posicaoSegmentos[0][1]] = caracterCabeca + " ";
-        for (int i = 1; i < posicaoSegmentos.length; i++) {
-            tabuleiro[posicaoSegmentos[i][0]][posicaoSegmentos[i][1]] = caracterCorpo + " ";
+        try {
+            tabuleiro[posicaoSegmentos[0][0]][posicaoSegmentos[0][1]] = caracterCabeca + " ";
+            for (int i = 1; i < posicaoSegmentos.length; i++) {
+                tabuleiro[posicaoSegmentos[i][0]][posicaoSegmentos[i][1]] = caracterCorpo + " ";
+            }
+        } catch (ArrayIndexOutOfBoundsException exception) {
+            return tabuleiro;
         }
         return tabuleiro;
     }
@@ -241,7 +260,11 @@ public class Snake {
     }
 
     public static String[][] limparCalda(String[][] tabuleiro, int[] posicaoCalda) {
-        tabuleiro[posicaoCalda[0]][posicaoCalda[1]] = caracterTabuleiro + " ";
+        try {
+            tabuleiro[posicaoCalda[0]][posicaoCalda[1]] = caracterTabuleiro + " ";
+        } catch (ArrayIndexOutOfBoundsException exception) {
+            return tabuleiro;
+        }
         return tabuleiro;
     }
 
@@ -270,7 +293,9 @@ public class Snake {
     }
 
     public static boolean checarColisao(int[][] posicaoSegmentos, int[][] posicaoObstaculos, int tamanhoTabuleiro) {
-        if (posicaoSegmentos[0][0] == tamanhoTabuleiro - 1 || posicaoSegmentos[0][1] == 0) {
+        if (posicaoSegmentos[0][0] == tamanhoTabuleiro - 1 || posicaoSegmentos[0][0] == -1
+                || posicaoSegmentos[0][1] == -1
+                || posicaoSegmentos[0][1] == tamanhoTabuleiro) {
             return true;
         }
         for (int i = 0; i < posicaoSegmentos.length; i++) {
@@ -302,7 +327,7 @@ public class Snake {
 
         boolean rodando = true;
         while (rodando) {
-            limparTerminal();
+            //limparTerminal();
             printarTabuleiro(tabuleiro);
 
             inputCobra = inputCobra(scanner);
@@ -349,6 +374,14 @@ public class Snake {
         }
     }
 
+    public static void skinTabuleiro(Scanner scanner) {
+        System.out.println("Insira o caracter que ira compor o tabuleiro. \" \" sera usado caso insira \"X\"");
+        caracterCabeca = scanner.next().charAt(0);
+        if (caracterCabeca == 'X') {
+            caracterCabeca = ' ';
+        }
+    }
+
     public static void printarSnake() {
         System.out.println("  .-^-.");
         System.out.println(" /     \\       .- ~ ~ -.");
@@ -383,9 +416,11 @@ public class Snake {
             tamanhoTabuleiro = 8;
         }
 
-        int dificuldade = inputDificuldade(scanner);
+        skinTabuleiro(scanner);
 
         skinCobra(scanner);
+
+        int dificuldade = inputDificuldade(scanner);
 
         String[][] tabuleiro = preencherTabuleiro(tamanhoTabuleiro);
 
@@ -403,5 +438,3 @@ public class Snake {
 
 // TODO bug 2 segmentos colisao
 // TODO bug when 4 segs, e faz quadrado, cabeça limpada cause cabeça = cauda
-// TODO pao de queijo
-// TODO bug fruta input so letras
