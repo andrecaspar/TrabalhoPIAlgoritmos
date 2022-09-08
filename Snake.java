@@ -327,7 +327,7 @@ public class Snake {
 
         boolean rodando = true;
         while (rodando) {
-            //limparTerminal();
+            limparTerminal();
             printarTabuleiro(tabuleiro);
 
             inputCobra = inputCobra(scanner);
