@@ -435,6 +435,3 @@ public class Snake {
         System.out.println("FIM DE JOGO!");
     }
 }
-
-// TODO bug 2 segmentos colisao
-// TODO bug when 4 segs, e faz quadrado, cabeça limpada cause cabeça = cauda
